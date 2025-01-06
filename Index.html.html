@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>QR Code Generator SMAN 3 BULUKUMBA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="jam" id="current-time">15:20</div>
+    <p>Masukkan nama Anda untuk presensi absen</p>
+    </header>
+    <div class="form">
+      <input type="text" spellcheck="false" placeholder="Nama siswa">
+      <button>Generate QR Code</button>
+      <p class="time-error" style="color: green; display: none;">Maaf batasan waktu absensi yang ditentukan telah
+        habis🙇.</p>
+    </div>
+    <div class="qr-code">
+      <img src=" alt=" qr-code">
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>
+<style>
+  /* Import Google Font - Poppins */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .jam {
+    background-color: aqua;
+    display: flex;
+    justify-content: center;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px;
+    padding: 2px;
+    margin-left: 180px;
+    
+  }
+  body {
+    display: flex;
+    padding: 0 20px;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background-image: url('https://github.com/SMAGA742/SMAGA/blob/main/Gerbang.jpg?raw=true'); /* Path file gambar */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  ::selection {
+    color: #fff;
+    background: #3498DB;
+  }
+
+  .wrapper {
+    height: 350px; /* Adjusted height */
+    max-width: 4000px;
+    background: rgba(255, 255, 255, 0.9); /* Transparan  warna putih */
+    border-radius: 8px;
+    padding: 25px 10px 0;
+    transition: height 0.2s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .wrapper.active {
+    height: 530px;
+  }
+
+  header h1 {
+    font-size: 21px;
+    font-weight: 500;
+  }
+
+  header p {
+    margin-top: 5px;
+    color: #575757;
+    font-size: 16px;
+  }
+
+  .wrapper .form {
+    margin: 20px 0 25px;
+  }
+
+  .form :where(input, button) {
+    width: 100%;
+    height: 55px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    transition: 0.1s ease;
+  }
+
+  .form input {
+    font-size: 18px;
+    padding: 0 17px;
+    border: 1px solid #999;
+  }
+
+  .form input:focus {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
+  }
+
+  .form input::placeholder {
+    color: #999;
+  }
+
+  .form button {
+    color: #fff;
+    cursor: pointer;
+    margin-top: 30px;
+    font-size: 15px;
+    background: #3498DB;
+  }
+
+  .qr-code {
+    opacity: 0;
+    display: flex;
+    padding: 12px 0;
+    border-radius: 5px;
+    align-items: center;
+    pointer-events: none;
+    justify-content: center;
+    border: 8px solid #ccc;
+  }
+
+  .wrapper.active .qr-code {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.5s 0.05s ease;
+  }
+
+  .qr-code img {
+    width: 150px;
+  }
+
+  @media (max-width: 430px) {
+    .wrapper {
+      height: 305px; /* Adjusted height for mobile */
+      padding: 16px 20px;
+    }
+
+    .wrapper.active {
+      height: 510px;
+    }
+
+    header p {
+      color: #696969;
+    }
+
+    .form :where(input, button) {
+      height: 52px;
+    }
+
+    .qr-code img {
+      width: 160px;
+    }
+  }
+</style>
+
+<script>
+  const wrapper = document.querySelector(".wrapper"),
+    qrInput = wrapper.querySelector(".form input"),
+    generateBtn = wrapper.querySelector(".form button"),
+    qrImg = wrapper.querySelector(".qr-code img"),
+    timeError = wrapper.querySelector(".time-error");
+
+  let preValue;
+
+  function isWithinAllowedTime() {
+    const now = new Date();
+    const start = new Date();
+    const end = new Date();
+
+    start.setHours(5, 30, 0); // 5:30 AM
+    end.setHours(7, 20, 0); // 7:20 PM
+
+    return now >= start && now <= end;
+  }
+
+  generateBtn.addEventListener("click", () => {
+    // Check time validity
+    if (!isWithinAllowedTime()) {
+      timeError.style.display = "block";
+      return;
+    } else {
+      timeError.style.display = "none";
+    }
+
+    // Validate input
+    let qrValue = qrInput.value.trim();
+    if (!qrValue || preValue === qrValue) return;
+
+    preValue = qrValue;
+    generateBtn.innerText = "Memproses qr code...";
+
+    // Set QR code image source
+    qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrValue);
+
+    qrImg.addEventListener("load", () => {
+      wrapper.classList.add("active");
+      generateBtn.innerText = "Generate QR Code";
+    });
+  });
+
+  qrInput.addEventListener("keyup", () => {
+    if (!qrInput.value.trim()) {
+      wrapper.classList.remove("active");
+      preValue = "";
+    }
+  });
+
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+</script>
